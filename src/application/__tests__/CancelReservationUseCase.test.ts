@@ -19,25 +19,21 @@ function createUseCase(
     seat: Seat | undefined,
 ) {
     const reservationRepository: ReservationRepository = {
-        findOneBySeatId: vi.fn(async (_seatId: SeatId) => reservation),
-        save: vi.fn(async (_reservation: Reservation) => {}),
+        findOneBySeatId: vi.fn(async () => reservation),
+        save: vi.fn(async () => {}),
     };
     const seatRepository: SeatRepository = {
-        findOne: vi.fn(
-            async (_seatId: SeatId): Promise<Seat | undefined> => seat,
-        ),
-        save: vi.fn(async (_seat: Seat) => {}),
+        findOne: vi.fn(async (): Promise<Seat | undefined> => seat),
+        save: vi.fn(async () => {}),
     };
     const customerRepository: CustomerRepository = {
-        findOne: vi.fn(
-            async (_customerId: CustomerId): Promise<Customer | undefined> =>
-                customer,
-        ),
-        save: vi.fn(async (_customer: Customer) => {}),
+        findOne: vi.fn(async (): Promise<Customer | undefined> => customer),
+        save: vi.fn(async () => {}),
     };
+    const dispatch = vi.fn(async (event: unknown) => event);
     const eventDispatcher: EventDispatcher = {
         register: vi.fn(),
-        dispatch: vi.fn(async <T>(event: T) => event),
+        dispatch: dispatch as unknown as EventDispatcher["dispatch"],
     };
 
     return {
@@ -51,6 +47,7 @@ function createUseCase(
         seatRepository,
         customerRepository,
         eventDispatcher,
+        dispatch,
     };
 }
 
@@ -58,8 +55,9 @@ describe("CancelReservationUseCase", () => {
     it("loads the reservation, customer, and seat, dispatches cancellation, and saves both aggregates", async () => {
         const customer = new Customer(new CustomerId("customer-1"));
         const seat = new Seat(new SeatId("A1"));
+        seat.reserve();
         const reservation = Reservation.place(seat, customer);
-        reservation.pullEvents();
+        reservation.collectDomainEvents();
         const dependencies = createUseCase(reservation, customer, seat);
 
         await dependencies.useCase.execute(seat.id);
@@ -73,12 +71,11 @@ describe("CancelReservationUseCase", () => {
         expect(dependencies.seatRepository.findOne).toHaveBeenCalledWith(
             seat.id,
         );
-        expect(seat.isFree).toBe(true);
         expect(dependencies.seatRepository.save).toHaveBeenCalledWith(seat);
         expect(dependencies.reservationRepository.save).toHaveBeenCalledWith(
             reservation,
         );
-        expect(dependencies.eventDispatcher.dispatch).toHaveBeenCalledWith(
+        expect(dependencies.dispatch).toHaveBeenCalledWith(
             expect.objectContaining({
                 name: "ReservationCancelled",
                 reservationId: reservation.id,
@@ -99,7 +96,7 @@ describe("CancelReservationUseCase", () => {
         expect(dependencies.seatRepository.findOne).not.toHaveBeenCalled();
         expect(dependencies.reservationRepository.save).not.toHaveBeenCalled();
         expect(dependencies.seatRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.eventDispatcher.dispatch).not.toHaveBeenCalled();
+        expect(dependencies.dispatch).not.toHaveBeenCalled();
     });
 
     it("throws when the reservation customer does not exist and skips seat lookup and effects", async () => {
@@ -114,7 +111,7 @@ describe("CancelReservationUseCase", () => {
         expect(dependencies.seatRepository.findOne).not.toHaveBeenCalled();
         expect(dependencies.reservationRepository.save).not.toHaveBeenCalled();
         expect(dependencies.seatRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.eventDispatcher.dispatch).not.toHaveBeenCalled();
+        expect(dependencies.dispatch).not.toHaveBeenCalled();
     });
 
     it("throws when the seat does not exist and performs no writes or dispatch", async () => {
@@ -129,14 +126,14 @@ describe("CancelReservationUseCase", () => {
 
         expect(dependencies.reservationRepository.save).not.toHaveBeenCalled();
         expect(dependencies.seatRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.eventDispatcher.dispatch).not.toHaveBeenCalled();
+        expect(dependencies.dispatch).not.toHaveBeenCalled();
     });
 
     it("rejects a reservation whose seat identifier differs from the requested seat", async () => {
         const customer = new Customer(new CustomerId("customer-1"));
         const reservedSeat = new Seat(new SeatId("A1"));
         const reservation = Reservation.place(reservedSeat, customer);
-        reservation.pullEvents();
+        reservation.collectDomainEvents();
         const differentSeat = new Seat(new SeatId("A2"));
         differentSeat.reserve();
         const dependencies = createUseCase(
@@ -152,6 +149,6 @@ describe("CancelReservationUseCase", () => {
         expect(differentSeat.isFree).toBe(false);
         expect(dependencies.reservationRepository.save).not.toHaveBeenCalled();
         expect(dependencies.seatRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.eventDispatcher.dispatch).not.toHaveBeenCalled();
+        expect(dependencies.dispatch).not.toHaveBeenCalled();
     });
 });

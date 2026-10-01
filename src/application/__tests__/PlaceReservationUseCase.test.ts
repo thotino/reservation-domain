@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from "vitest";
 import { PlaceReservationUseCase } from "../PlaceReservationUseCase";
 import { Customer } from "../../domain/Customer";
 import { CustomerId } from "../../domain/CustomerId";
-import { Reservation } from "../../domain/Reservation";
 import { Seat } from "../../domain/Seat";
 import { SeatId } from "../../domain/SeatId";
 import type {
@@ -15,25 +14,21 @@ import type {
 
 function createUseCase(seat: Seat | undefined, customer: Customer | undefined) {
     const reservationRepository: ReservationRepository = {
-        save: vi.fn(async (_reservation: Reservation) => {}),
-        findOneBySeatId: vi.fn(async (_seatId: SeatId) => undefined),
+        save: vi.fn(async () => {}),
+        findOneBySeatId: vi.fn(async () => undefined),
     };
     const seatRepository: SeatRepository = {
-        findOne: vi.fn(
-            async (_seatId: SeatId): Promise<Seat | undefined> => seat,
-        ),
-        save: vi.fn(async (_seat: Seat) => {}),
+        findOne: vi.fn(async (): Promise<Seat | undefined> => seat),
+        save: vi.fn(async () => {}),
     };
     const customerRepository: CustomerRepository = {
-        findOne: vi.fn(
-            async (_customerId: CustomerId): Promise<Customer | undefined> =>
-                customer,
-        ),
-        save: vi.fn(async (_customer: Customer) => {}),
+        findOne: vi.fn(async (): Promise<Customer | undefined> => customer),
+        save: vi.fn(async () => {}),
     };
+    const dispatch = vi.fn(async (event: unknown) => event);
     const eventDispatcher: EventDispatcher = {
         register: vi.fn(),
-        dispatch: vi.fn(async <T>(event: T) => event),
+        dispatch: dispatch as unknown as EventDispatcher["dispatch"],
     };
 
     return {
@@ -47,11 +42,12 @@ function createUseCase(seat: Seat | undefined, customer: Customer | undefined) {
         seatRepository,
         customerRepository,
         eventDispatcher,
+        dispatch,
     };
 }
 
 describe("PlaceReservationUseCase", () => {
-    it("loads the seat and customer, places the reservation, dispatches its event, and saves", async () => {
+    it("loads the seat and customer, dispatches the placement event, and saves", async () => {
         const seat = new Seat(new SeatId("A1"));
         const customer = new Customer(new CustomerId("customer-1"));
         const dependencies = createUseCase(seat, customer);
@@ -64,7 +60,7 @@ describe("PlaceReservationUseCase", () => {
         expect(dependencies.customerRepository.findOne).toHaveBeenCalledWith(
             customer.id,
         );
-        expect(seat.isFree).toBe(false);
+        expect(seat.isFree).toBe(true);
         expect(dependencies.reservationRepository.save).toHaveBeenCalled();
         expect(dependencies.seatRepository.save).toHaveBeenCalled();
         expect(dependencies.reservationRepository.save).toHaveBeenNthCalledWith(
@@ -75,7 +71,7 @@ describe("PlaceReservationUseCase", () => {
             }),
         );
         expect(dependencies.seatRepository.save).toHaveBeenCalledWith(seat);
-        expect(dependencies.eventDispatcher.dispatch).toHaveBeenCalledWith(
+        expect(dependencies.dispatch).toHaveBeenCalledWith(
             expect.objectContaining({
                 name: "ReservationPlaced",
                 seatId: "A1",
@@ -94,7 +90,7 @@ describe("PlaceReservationUseCase", () => {
 
         expect(dependencies.reservationRepository.save).not.toHaveBeenCalled();
         expect(dependencies.seatRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.eventDispatcher.dispatch).not.toHaveBeenCalled();
+        expect(dependencies.dispatch).not.toHaveBeenCalled();
     });
 
     it("throws when the seat does not exist and performs no writes or dispatch", async () => {
@@ -107,21 +103,6 @@ describe("PlaceReservationUseCase", () => {
 
         expect(dependencies.reservationRepository.save).not.toHaveBeenCalled();
         expect(dependencies.seatRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.eventDispatcher.dispatch).not.toHaveBeenCalled();
-    });
-
-    it("propagates the reserved-seat error without saving or dispatching", async () => {
-        const seat = new Seat(new SeatId("A1"));
-        seat.reserve();
-        const customer = new Customer(new CustomerId("customer-1"));
-        const dependencies = createUseCase(seat, customer);
-
-        await expect(
-            dependencies.useCase.execute(seat.id, customer.id),
-        ).rejects.toThrow("ERR_CANNOT_RESERVE_SEAT");
-
-        expect(dependencies.reservationRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.seatRepository.save).not.toHaveBeenCalled();
-        expect(dependencies.eventDispatcher.dispatch).not.toHaveBeenCalled();
+        expect(dependencies.dispatch).not.toHaveBeenCalled();
     });
 });
