@@ -2,6 +2,8 @@ import { EventHandler, ReservationPlacedEvent } from "../types";
 
 export class RecordAuditLogHandler implements EventHandler<ReservationPlacedEvent> {
     async handle(event: ReservationPlacedEvent) {
-        console.log(`Seat ${event.seatId} reserved by customer ${event.customerId}`)
+        console.log(
+            `Reservation for seat ${event.seatId} placed by customer ${event.customerId}`,
+        );
     }
 }

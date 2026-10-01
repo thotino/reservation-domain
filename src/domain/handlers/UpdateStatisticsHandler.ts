@@ -1,8 +1,23 @@
-import { EventHandler, ReservationPlacedEvent } from "../types";
+import {
+    EventHandler,
+    SeatReservationCancelledEvent,
+    SeatReservedEvent,
+} from "../types";
 
-export class UpdateStatisticsHandler implements EventHandler<ReservationPlacedEvent> {
+export class UpdateStatisticsHandler implements EventHandler<
+    SeatReservedEvent | SeatReservationCancelledEvent
+> {
     #reservedSeats: number = 0;
-    async handle(event: ReservationPlacedEvent) {
-        this.#reservedSeats++;
+    async handle(event: SeatReservedEvent | SeatReservationCancelledEvent) {
+        switch (event.name) {
+            case "SeatReserved":
+                this.#reservedSeats++;
+                break;
+            case "SeatReservationCancelled":
+                this.#reservedSeats--;
+                break;
+            default:
+                throw new Error("ERR_UNKNOWN_EVENT_NAME");
+        }
     }
 }
