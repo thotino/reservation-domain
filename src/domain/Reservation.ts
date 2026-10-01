@@ -53,7 +53,7 @@ export class Reservation {
             customerId: this.#customerId.value,
             seatId: this.#seatId.value,
             reservationId: this.#id,
-            occuredAt: new Date(),
+            occurredAt: new Date(),
             name: "ReservationPlaced",
             eventId: crypto.randomUUID(),
         });
@@ -62,7 +62,7 @@ export class Reservation {
         this.#pushEvents({
             name: "ReservationCancelled",
             customerId: this.#customerId.value,
-            occuredAt: new Date(),
+            occurredAt: new Date(),
             reservationId: this.#id,
             seatId: this.#seatId.value,
             eventId: crypto.randomUUID(),

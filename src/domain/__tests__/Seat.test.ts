@@ -56,7 +56,7 @@ describe("Seat reservation event handlers", () => {
             customerId: "customer-1",
             seatId: "A1",
             reservationId: "reservation-1",
-            occuredAt: new Date(),
+            occurredAt: new Date(),
             eventId: "event-1",
         });
 

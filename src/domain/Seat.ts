@@ -19,7 +19,7 @@ export class Seat {
             this.#isFree = false;
             this.#events.push({
                 name: "SeatReserved",
-                occuredAt: new Date(),
+                occurredAt: new Date(),
                 seatId: this.#id.value,
                 eventId: crypto.randomUUID(),
             });
@@ -32,7 +32,7 @@ export class Seat {
             this.#isFree = true;
             this.#events.push({
                 name: "SeatReservationCancelled",
-                occuredAt: new Date(),
+                occurredAt: new Date(),
                 seatId: this.#id.value,
                 eventId: crypto.randomUUID(),
             });

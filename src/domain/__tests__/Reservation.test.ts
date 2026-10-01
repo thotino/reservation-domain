@@ -25,7 +25,7 @@ describe("Reservation domain", () => {
         expect(events[0].customerId).toBe("customer-1");
         expect(events[0].seatId).toBe("A1");
         expect(events[0].reservationId).toBe(reservation.id);
-        expect(events[0].occuredAt).toBeInstanceOf(Date);
+        expect(events[0].occurredAt).toBeInstanceOf(Date);
         expect(reservation.collectDomainEvents()).toEqual([]);
     });
 
@@ -59,7 +59,7 @@ describe("Reservation domain", () => {
         expect(cancelledEvents[0].customerId).toBe("customer-2");
         expect(cancelledEvents[0].seatId).toBe("B1");
         expect(cancelledEvents[0].reservationId).toBe(reservation.id);
-        expect(cancelledEvents[0].occuredAt).toBeInstanceOf(Date);
+        expect(cancelledEvents[0].occurredAt).toBeInstanceOf(Date);
         expect(reservation.collectDomainEvents()).toEqual([]);
     });
 });
@@ -85,7 +85,7 @@ describe("EventDispatcher", () => {
             seatId: "C3",
             customerId: "customer-3",
             reservationId: "reservation-3",
-            occuredAt: new Date(),
+            occurredAt: new Date(),
             eventId: "event-3",
         };
 
@@ -116,7 +116,7 @@ describe("EventDispatcher", () => {
             seatId: "C4",
             customerId: "customer-4",
             reservationId: "reservation-4",
-            occuredAt: new Date(),
+            occurredAt: new Date(),
             eventId: "event-4",
         };
 

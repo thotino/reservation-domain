@@ -26,32 +26,29 @@ export interface CustomerRepository {
     findOne(customerId: CustomerId): Promise<Customer | undefined>;
 }
 export interface SeatReservedEvent extends Event {
-    name: "SeatReserved";
-    seatId: string;
-    occuredAt: Date;
+    readonly name: "SeatReserved";
+    readonly seatId: string;
 }
 export interface SeatReservationCancelledEvent extends Event {
-    name: "SeatReservationCancelled";
-    seatId: string;
-    occuredAt: Date;
+    readonly name: "SeatReservationCancelled";
+    readonly seatId: string;
 }
 export interface ReservationPlacedEvent extends Event {
-    seatId: string;
-    customerId: string;
-    reservationId: string;
-    occuredAt: Date;
-    name: "ReservationPlaced";
+    readonly seatId: string;
+    readonly customerId: string;
+    readonly reservationId: string;
+    readonly name: "ReservationPlaced";
 }
 
 export interface ReservationCancelledEvent extends Event {
-    seatId: string;
-    customerId: string;
-    reservationId: string;
-    occuredAt: Date;
-    name: "ReservationCancelled";
+    readonly seatId: string;
+    readonly customerId: string;
+    readonly reservationId: string;
+    readonly name: "ReservationCancelled";
 }
 
 interface Event {
-    name: string;
-    eventId: string;
+    readonly name: string;
+    readonly eventId: string;
+    readonly occurredAt: Date;
 }
