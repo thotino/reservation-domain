@@ -1,8 +1,16 @@
 import { SeatId } from "../SeatId";
-import { EventDispatcher, EventHandler, ReservationPlacedEvent, SeatRepository } from "../types";
+import {
+    EventDispatcher,
+    EventHandler,
+    ReservationPlacedEvent,
+    SeatRepository,
+} from "../types";
 
 export class ReserveSeatHandler implements EventHandler<ReservationPlacedEvent> {
-    constructor(readonly seatRepository: SeatRepository, readonly eventDispatcher: EventDispatcher) {}
+    constructor(
+        readonly seatRepository: SeatRepository,
+        readonly eventDispatcher: EventDispatcher,
+    ) {}
     async handle(event: ReservationPlacedEvent) {
         const seat = await this.seatRepository.findOne(
             SeatId.fromString(event.seatId),
@@ -14,7 +22,7 @@ export class ReserveSeatHandler implements EventHandler<ReservationPlacedEvent> 
         await this.seatRepository.save(seat);
         const events = seat.collectDomainEvents();
         for (const event of events) {
-            await this.eventDispatcher.dispatch(event)
+            await this.eventDispatcher.dispatch(event);
         }
     }
 }

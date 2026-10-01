@@ -7,7 +7,10 @@ import {
 } from "../types";
 
 export class CancelSeatReservationHandler implements EventHandler<ReservationCancelledEvent> {
-    constructor(readonly seatRepository: SeatRepository, readonly eventDispatcher: EventDispatcher) {}
+    constructor(
+        readonly seatRepository: SeatRepository,
+        readonly eventDispatcher: EventDispatcher,
+    ) {}
     async handle(event: ReservationCancelledEvent): Promise<void> {
         const seat = await this.seatRepository.findOne(
             SeatId.fromString(event.seatId),
@@ -19,7 +22,7 @@ export class CancelSeatReservationHandler implements EventHandler<ReservationCan
         await this.seatRepository.save(seat);
         const events = seat.collectDomainEvents();
         for (const event of events) {
-            await this.eventDispatcher.dispatch(event)
+            await this.eventDispatcher.dispatch(event);
         }
     }
 }
