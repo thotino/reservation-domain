@@ -30,11 +30,10 @@ Les fichiers de tests vivent au plus près des fichiers testés dans un dossier 
 Par exemple, les tests du module `/src/domain/Customer.ts` doivent être mis dans le dossier `/src/domain/__tests__/`
 
 ## Sous-agents
-Des sous-agents existent dans ce repo. Ils sont disponibles dans le dossier `/.github/agents/`.
+Des sous-agents existent dans ce repo. Ils sont disponibles dans le dossier `/.claude/agents/`.
 * `readme-specialist.agent.md` - pour l'écriture et la mise à jour du README
 * `test-specialist.agent.md` - pour l'écriture et la mise à jour des tests unitaires
 * `code-improver-specialist.agent.md` - pour analyser et améliorer le code écrit
-* `git-specialist.agent.md` - pour le versioning des fichiers
 
 ## Gestion des modifications
 
