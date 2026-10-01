@@ -5,43 +5,53 @@ import { Seat } from "./Seat";
 import { SeatId } from "./SeatId";
 
 export interface EventHandler<T> {
-  handle(event: T): Promise<void>;
+    handle(event: T): Promise<void>;
 }
 
 export interface EventDispatcher {
-  register<T>(eventName: string, handler: EventHandler<T>): void;
-  dispatch<T>(event: T): Promise<T>;
+    register<T>(eventName: string, handler: EventHandler<T>): void;
+    dispatch<T>(event: T): Promise<T>;
 }
 
 export interface ReservationRepository {
-  save(reservation: Reservation): Promise<void>;
-  findOneBySeatId(seatId: SeatId): Promise<Reservation | undefined>;
+    save(reservation: Reservation): Promise<void>;
+    findOneBySeatId(seatId: SeatId): Promise<Reservation | undefined>;
 }
 export interface SeatRepository {
-  save(seat: Seat): Promise<void>;
-  findOne(seatId: SeatId): Promise<Seat | undefined>
+    save(seat: Seat): Promise<void>;
+    findOne(seatId: SeatId): Promise<Seat | undefined>;
 }
 export interface CustomerRepository {
-  save(customer: Customer): Promise<void>;
-  findOne(customerId: CustomerId): Promise<Customer | undefined>
+    save(customer: Customer): Promise<void>;
+    findOne(customerId: CustomerId): Promise<Customer | undefined>;
 }
-
+export interface SeatReservedEvent extends Event {
+    name: "SeatReserved";
+    seatId: string;
+    occuredAt: Date;
+}
+export interface SeatReservationCancelledEvent extends Event {
+    name: "SeatReservationCancelled";
+    seatId: string;
+    occuredAt: Date;
+}
 export interface ReservationPlacedEvent extends Event {
-  seatId: string;
-  customerId: string;
-  reservationId: string;
-  occuredAt: Date;
-  name: "ReservationPlaced";
+    seatId: string;
+    customerId: string;
+    reservationId: string;
+    occuredAt: Date;
+    name: "ReservationPlaced";
 }
 
 export interface ReservationCancelledEvent extends Event {
-  seatId: string;
-  customerId: string;
-  reservationId: string;
-  occuredAt: Date;
-  name: "ReservationCancelled";
+    seatId: string;
+    customerId: string;
+    reservationId: string;
+    occuredAt: Date;
+    name: "ReservationCancelled";
 }
 
 interface Event {
-  name: string;
+    name: string;
+    eventId: string;
 }
