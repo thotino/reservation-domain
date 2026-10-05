@@ -24,15 +24,12 @@ export class PlaceReservationUseCase {
         if (seat == null) {
             throw new Error("ERR_SEAT_NOT_FOUND");
         }
-        const reservation =
-            await ReservationApplicationService.handlePlaceReservation(
+        await ReservationApplicationService.handlePlaceReservation(
                 seat,
                 customer,
                 this.reservationRepository,
                 this.seatRepository,
                 this.eventDispatcher,
             );
-        await this.reservationRepository.save(reservation);
-        await this.seatRepository.save(seat);
     }
 }

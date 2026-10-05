@@ -37,7 +37,5 @@ export class CancelReservationUseCase {
             this.seatRepository,
             this.eventDispatcher,
         );
-        // await this.seatRepository.save(seat);
-        // await this.reservationRepository.save(reservation);
     }
 }
