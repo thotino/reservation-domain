@@ -27,7 +27,7 @@ Ce module est structuré en 3 parties:
 ## Tests
 Les tests sont effectués avec le framework `vitest`.
 Les fichiers de tests vivent au plus près des fichiers testés dans un dossier intitulé `__tests__`.
-Par exemple, les tests du module `/src/domain/Customer.ts` doivent être mis dans le dossier `/src/domain/__tests__/`
+Par exemple, les tests du module `/src/domain/Customer.ts` doivent être mis dans le dossier `/src/domain/__tests__/`. Chaque module exporté doit avoir droit à son module/fichier de test. Chaque méthode de chaque module/classe doit être testé.
 
 ## Sous-agents
 Des sous-agents existent dans ce repo. Ils sont disponibles dans le dossier `/.claude/agents/`.
